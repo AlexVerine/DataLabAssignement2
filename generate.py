@@ -69,7 +69,6 @@ if __name__ == '__main__':
                           x_dim[1]*x_dim[2],
                           1,
                           1).cuda()
-            print(sample.shape)
             x, _ = model(sample, None, True)
             x = x[:, :, 2:30, 2:30]
             torchvision.utils.save_image(x, os.path.join('samples', f'{idx}.png'))            
