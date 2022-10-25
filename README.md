@@ -34,6 +34,6 @@ To train a model :
 
 To generate :
 
-> python train.py --n_samples 1024
+> python generate.py 
 
 
