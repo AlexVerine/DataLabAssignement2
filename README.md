@@ -11,7 +11,7 @@ Example project for Assignement 2 : Generative model
     > pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 
 * Install the required packages:
-    > pip3 install -r requirements.txt
+    > pip3 install -r requirements2.txt
 
 
 
