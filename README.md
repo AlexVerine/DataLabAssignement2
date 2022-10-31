@@ -19,7 +19,7 @@ Example project for Assignement 2 : Generative model
 ***
 To train a model :
 
-> python train.py --epochs 600 
+> python train.py --epochs 50 
 
 To generate :
 
