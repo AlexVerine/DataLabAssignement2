@@ -17,12 +17,13 @@ Example project for Assignement 2 : Generative model
 
 
 ***
-To train a model :
 
-> python train.py --epochs 50 
-
+The pretrained model is the folder /checkpoints/.
 To generate :
 
 > python generate.py 
 
 
+If you want to retrain the model :
+
+> python train.py --epochs 50 
