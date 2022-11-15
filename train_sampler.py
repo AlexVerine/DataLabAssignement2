@@ -1,5 +1,3 @@
-from asyncio import DatagramProtocol
-from curses import BUTTON1_PRESSED
 import torch 
 import numpy as np
 import tqdm
@@ -83,10 +81,10 @@ if __name__ == '__main__':
     parser.add_argument("--padding", type=int, default=0)
     parser.add_argument("--num_levels", type=int, default=0,
                       help="Number of downsizing to use in the model.")
-    parser.add_argument("--num_channels", type=int, default=32,
+    parser.add_argument("--num_channels", type=int, default=16,
                       help="Number of channels to use in the model.")
-    parser.add_argument("--num_features", type=int, default=1024)
-    parser.add_argument("--num_steps", type=int, default=15,
+    parser.add_argument("--num_features", type=int, default=256)
+    parser.add_argument("--num_steps", type=int, default=5,
                       help="Depth of the model.")
     parser.add_argument("--batchnorm", default=False, action='store_false')
     parser.add_argument("--actnorm", default=True, action='store_true')
@@ -116,7 +114,6 @@ if __name__ == '__main__':
     print('Dataset Loaded.')
 
 
-    print('Model Loading...')
     # Model Pipeline
     x_dim = (1, 32, 32)
     args.num_levels = int(np.log2(x_dim[1]))-1
