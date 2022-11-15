@@ -153,10 +153,9 @@ if __name__ == '__main__':
     with trange(args.epochs, desc="Epoch", unit="epoch") as te:
         for epoch in te:
             D.train()
-            te.set_description(f'loss eval: {loss_eval : .2f} \t best loss: {best_loss : .2f}')
             with tqdm(train_loader, desc="Training", unit="batch", leave=False) as bt:
                 for n_batch, (inputs, label) in enumerate(bt):
-                    samples = generate_data(args.batch_size, model, x_dim)
+                    samples = generate_data(inputs.shape[0], model, x_dim)
                     loss = one_step_training(inputs, samples, optimizer, D, criterion)
                     bt.set_postfix(loss=loss)
             D.eval()
@@ -165,7 +164,7 @@ if __name__ == '__main__':
             fake_loss_eval = 0
             with tqdm(test_loader, desc= "Evaluation",  leave=False) as bte:
                 for n_batch, (inputs, label) in enumerate(bte):
-                    samples = generate_data(args.batch_size, model, x_dim)
+                    samples = generate_data(inputs.shape[0], model, x_dim)
                     real_loss_eval_i, fake_loss_eval_i, loss_eval_i = one_step_eval(inputs, samples, D, criterion)
                     loss_eval += loss_eval_i 
                     real_loss_eval += real_loss_eval_i
