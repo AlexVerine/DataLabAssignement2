@@ -1,6 +1,6 @@
 import torch 
 import numpy as np
-import tqdm
+from tqdm import tqdm, trange
 import os
 import argparse
 
@@ -147,27 +147,36 @@ if __name__ == '__main__':
     criterion = torch.nn.BCELoss()
 
 
+    print('Start Training :')
 
-    loss_eval = np.inf
     best_loss = np.inf
-    with tqdm.trange(args.epochs) as te:
-
+    with trange(args.epochs, desc="Epoch", unit="epoch") as te:
         for epoch in te:
+            D.train()
             te.set_description(f'loss eval: {loss_eval : .2f} \t best loss: {best_loss : .2f}')
-            with tqdm(train_loader, leave=False) as bt:
+            with tqdm(train_loader, desc="Training", unit="batch", leave=False) as bt:
                 for n_batch, (inputs, label) in enumerate(bt):
                     samples = generate_data(args.batch_size, model, x_dim)
                     loss = one_step_training(inputs, samples, optimizer, D, criterion)
-                    bt.set_description(f'Batch {n_batch}, Train {loss: .2f}')
-            with tqdm(test_loader, leave=False) as bte:
+                    bt.set_postfix(loss=loss)
+            D.eval()
+            loss_eval = 0 
+            real_loss_eval = 0
+            fake_loss_eval = 0
+            with tqdm(test_loader, desc= "Evaluation",  leave=False) as bte:
                 for n_batch, (inputs, label) in enumerate(bte):
                     samples = generate_data(args.batch_size, model, x_dim)
-                    real_loss_eval, fake_loss_eval, loss_eval = one_step_eval(inputs, samples, D, criterion)
-                    bte.set_description(f'Batch {n_batch}, Real {real_loss_eval/(n_batch*args.batch_size): .2f}, Fake {fake_loss_eval/(n_batch*args.batch_size): .2f}')
+                    real_loss_eval_i, fake_loss_eval_i, loss_eval_i = one_step_eval(inputs, samples, D, criterion)
+                    loss_eval += loss_eval_i 
+                    real_loss_eval += real_loss_eval_i
+                    fake_loss_eval += fake_loss_eval_i
+                    bte.set_postfix(Real=real_loss_eval/((n_batch+1)*args.batch_size), 
+                                    Fake=fake_loss_eval/(((n_batch+1)*args.batch_size)))
             loss_eval /= 10000
             if loss_eval <= best_loss:
                 best_loss = loss_eval
                 save_model_D(D)
+            te.set_postfix(loss_eval=loss_eval, best_loss=best_loss)
             
     print('Training done')
 
