@@ -132,7 +132,7 @@ if __name__ == '__main__':
                 save_model(model)
             te.set_postfix(bpd_eval=bpd_eval, best_bpd=best_bpd)
             
-
+    print('Training done')
 
         
 

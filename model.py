@@ -385,15 +385,26 @@ class Discriminator(nn.Module):
 
         # The height and width of downsampled image
         ds_size = 32 // 2 ** 4
-        self.adv_layer = nn.Sequential(nn.Linear(128 * ds_size ** 2, 1), nn.Sigmoid())
+        self.adv_layer = nn.Sequential(nn.Linear(128 * ds_size ** 2, 1))
+        self.activation = nn.Sigmoid()
 
     def forward(self, img):
         out = img*2 -1
         out = self.model(out)
         out = out.view(out.shape[0], -1)
         validity = self.adv_layer(out)
-
+        validity = self.activation(validity)
         return validity
+
+    def pq(self, img):
+        out = img*2 -1
+        out = self.model(out)
+        out = out.view(out.shape[0], -1)
+        validity = self.adv_layer(out)
+        validity = torch.exp(validity)
+        return validity
+
+
 if __name__ == "__main__":
   model = Glow(in_channels=3, num_channels=32, num_levels=3, num_steps=1)
   print(model)
