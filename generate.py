@@ -7,6 +7,7 @@ import argparse
 
 
 from model import Glow, Discriminator
+from collections import OrderedDict
 
 
 from torchvision.datasets import MNIST
@@ -25,7 +26,11 @@ def load_model(model):
 
 def load_model_D(model):
     state = torch.load(os.path.join('checkpoint', 'bestmodel_D.pth'))
-    model.load_state_dict(state['model_state_dict'])
+    new_state_dict = OrderedDict()
+    for k, v in state['model_state_dict'].items():
+        name = k.replace("module.", "") # remove `module.`
+        new_state_dict[name] = v
+    model.load_state_dict(new_state_dict)
     return model
 
 def drs(pq, M, args):   
@@ -48,7 +53,7 @@ if __name__ == '__main__':
                       help="Number of generated samples.")
     parser.add_argument("--eps_drs", type=float, default=1e-3,
                       help="Number of generated samples.")   
-    parser.add_argument("--gamma_drs", type=float, default=0,
+    parser.add_argument("--gamma_drs", type=float, default=-3,
                       help="Number of generated samples.")
 
     args = parser.parse_args()
@@ -91,27 +96,29 @@ if __name__ == '__main__':
                           1).cuda()
             x, _ = model(sample, None, True)
             pq = D.pq(x)
-            M = torch.max(torch.vstack(pq, M))
-        te.set_postfix(M=M.cpu().numpy())
+            M = torch.max(torch.vstack((pq, M)))
+            te.set_postfix(M=M.detach().cpu().numpy())
 
     n_samples = 0
-    with trange(1024, desc="Generated", unit="img") as te:
-        for idx in te:
-            accepted = False
-            while accepted:                
-                n_samples += 1
-                sample = torch.randn(1,
-                            x_dim[1]*x_dim[2],
-                            1,
-                            1).cuda()
-                x, _ = model(sample, None, True)
-                pq = D.pq(x)
-                M = torch.max(torch.vstack(pq, M))
-                p_accept = drs(pq, M, args)
-                accepted = torch.rand(1) > p 
-            x = x[:, :, 2:30, 2:30]
-            torchvision.utils.save_image(x, os.path.join('samples', f'{idx}.png'))         
-            te.set_postfix(M=M.cpu().numpy(), rate=(idx+1)/n_samples)
+    with torch.no_grad():
+        with trange(1024, desc="Generated", unit="img") as te:
+            for idx in te:
+                accepted = False
+                while not accepted:                
+                    n_samples += 1
+                    sample = torch.randn(1,
+                                x_dim[1]*x_dim[2],
+                                1,
+                                1).cuda()
+                    x, _ = model(sample, None, True)
+                    pq = D.pq(x)
+                    M = torch.max(torch.vstack((pq, M)))
+                    p_accept = drs(pq, M, args)
+                    accepted = torch.rand(1).cuda() < p_accept
+                   
+                x = x[:, :, 2:30, 2:30]
+                torchvision.utils.save_image(x, os.path.join('samples', f'{idx}.png'))         
+                te.set_postfix(M=M.detach().cpu().numpy(), rate=(idx+1)/n_samples)
    
 
 

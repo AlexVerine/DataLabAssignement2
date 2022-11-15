@@ -402,6 +402,7 @@ class Discriminator(nn.Module):
         out = out.view(out.shape[0], -1)
         validity = self.adv_layer(out)
         validity = torch.exp(validity)
+        validity = torch.clamp(validity, max=200)
         return validity
 
 
