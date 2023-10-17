@@ -13,4 +13,5 @@ When your code will be test, we will execute:
 
 
 ## Checkpoints
-Push the minimal amount of model in the folder *checkpoints*.
+Push the minimal amount of models in the folder *checkpoints*.
+
