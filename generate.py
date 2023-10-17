@@ -9,7 +9,7 @@ from utils import load_model
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Normalizing Flow.')
-    parser.add_argument("--batch_size", type=int, default=256,
+    parser.add_argument("--batch_size", type=int, default=2048,
                       help="The batch size to use for training.")
     args = parser.parse_args()
 
