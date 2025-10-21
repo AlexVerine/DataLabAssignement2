@@ -45,7 +45,7 @@ We recommend using CUDA (for NVIDIA GPUs) or MPS (for Apple Silicon).
 To submit a job to MesoNet:
 ```bash
 # Make the script executable
-chmod +x generate.sh
+chmod +x scripts/train.sh
 
 # Submit the job to Slurm
 scripts/train.sh
