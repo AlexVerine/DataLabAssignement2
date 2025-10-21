@@ -15,14 +15,24 @@ if __name__ == '__main__':
 
 
 
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"Using device: CUDA")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print(f"Using device: MPS (Apple Metal)")
+    else:
+        device = torch.device("cpu")
+        print(f"Using device: CPU")
 
     print('Model Loading...')
     # Model Pipeline
     mnist_dim = 784
 
-    model = Generator(g_output_dim = mnist_dim).cuda()
-    model = load_model(model, 'checkpoints')
-    model = torch.nn.DataParallel(model).cuda()
+    model = Generator(g_output_dim=mnist_dim).to(device)
+    model = load_model(model, 'checkpoints', device)
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
     model.eval()
 
     print('Model loaded.')
@@ -35,7 +45,7 @@ if __name__ == '__main__':
     n_samples = 0
     with torch.no_grad():
         while n_samples<10000:
-            z = torch.randn(args.batch_size, 100).cuda()
+            z = torch.randn(args.batch_size, 100).to(device)
             x = model(z)
             x = x.reshape(args.batch_size, 28, 28)
             for k in range(x.shape[0]):
