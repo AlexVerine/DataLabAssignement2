@@ -28,6 +28,7 @@ On Juliet (MesoNet's cluster), you need to:
 ### 3. Run Training or Generation
 - Use the provided shell scripts (`scripts/train.sh` or `scripts/generate.sh`) to launch jobs.
 - These scripts will automatically activate the virtual environment (`venv`).
+- If you don't use Juliet cluster, please provide a data_path argument for the training scripts. Otherwise, everything should be automated.
 
 ### 4. Hardware Compatibility
 The code is compatible with:
