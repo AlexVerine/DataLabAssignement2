@@ -50,11 +50,24 @@ chmod +x scripts/train.sh
 # Submit the job to Slurm
 scripts/train.sh
 ```
+## train.py
+This script performs adversarial training for a GAN. Before running it, ensure the `DATA` variable in `scripts/train.sh` points to your dataset directory. If left unchanged, the script will create a default `data` folder in the repository root. If you use Juliet, no changes are required—the default path is already configured. You can adjust the learning rate, number of epochs, and batch size directly in `scripts/train.sh`.
 
 ## generate.py
-Use the file *generate.py* to generate 10000 samples of MNIST in the folder samples. 
+Use the file *generate.py* to generate 10000 samples of MNIST in the folder samples. You can launch this script on juliet with `scripts/generate.sh`
+
 Example:
   > python3 generate.py --bacth_size 64
+
+or 
+
+```bash
+# Make the script executable
+chmod +x scripts/generate.sh
+
+# Submit the job to Slurm
+scripts/generate.sh
+```
 
 ## requirements.txt
 Among the good pratice of datascience, we encourage you to use conda or virtualenv to create python environment. 

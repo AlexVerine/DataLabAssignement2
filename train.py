@@ -40,7 +40,6 @@ if __name__ == '__main__':
     # Create directories
     os.makedirs('checkpoints', exist_ok=True)
     data_path = os.getenv('DATA')
-    print(data_path)
     if data_path is None:
         data_path = "data"
         to_download = True
