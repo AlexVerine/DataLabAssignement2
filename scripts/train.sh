@@ -2,6 +2,8 @@
 name="test_train_datalab"
 outdir="outputs"
 n_gpu=1
+export DATA="/projects/m25146/data/"
+
     echo "Launching test for $name"
     
     sbatch <<EOT
@@ -16,9 +18,8 @@ n_gpu=1
 #SBATCH --job-name=gan_train      # Job name
 #SBATCH --output=${outdir}/%x_%j.out  # Standard output and error log
 #SBATCH --error=${outdir}/%x_%j.err  # Error log
-
 source venv/bin/activate
 # Run your training script
-python train.py --epochs 100 --lr 0.0002 --batch_size 64 --gpus ${n_gpu}
+python train.py --epochs 10 --lr 0.0002 --batch_size 64 --gpus ${n_gpu} 
 EOT
 

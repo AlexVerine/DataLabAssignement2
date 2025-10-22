@@ -14,10 +14,9 @@ if __name__ == '__main__':
     parser.add_argument("--lr", type=float, default=0.0002, help="Learning rate.")
     parser.add_argument("--batch_size", type=int, default=64, help="Size of mini-batches for SGD.")
     parser.add_argument("--gpus", type=int, default=-1, help="Number of GPUs to use (-1 for all available).")
-    parser.add_argument("--data_path", type=str, default=os.path.expanduser("~/../../projects/m25146/data/"))
-    
     args = parser.parse_args()
 
+    to_download=False
     if torch.cuda.is_available():
         device = torch.device("cuda")
         device_type = "cuda"
@@ -26,10 +25,10 @@ if __name__ == '__main__':
         if args.gpus == -1:
             args.gpus = torch.cuda.device_count()
             print(f"Using {args.gpus} GPUs.")
-    # elif torch.backends.mps.is_available():
-    #     device = torch.device("mps")
-    #     device_type = "mps"
-    #     print(f"Using device: MPS (Apple Metal)")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        device_type = "mps"
+        print(f"Using device: MPS (Apple Metal)")
     else:
         device = torch.device("cpu")
         device_type = "cpu"
@@ -40,18 +39,19 @@ if __name__ == '__main__':
 
     # Create directories
     os.makedirs('checkpoints', exist_ok=True)
-    to_download = not os.path.exists(args.data_path)
-    if to_download:
-        os.makedirs(args.data_path, exist_ok=False)
-    
+    data_path = os.getenv('DATA')
+    print(data_path)
+    if data_path is None:
+        data_path = "data"
+        to_download = True
     # Data Pipeline
     print('Dataset loading...')
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5,), std=(0.5,))
     ])
-    train_dataset = datasets.MNIST(root=args.data_path, train=True, transform=transform, download=to_download)
-    test_dataset = datasets.MNIST(root=args.data_path, train=False, transform=transform, download=to_download)
+    train_dataset = datasets.MNIST(root=data_path, train=True, transform=transform, download=to_download)
+    test_dataset = datasets.MNIST(root=data_path, train=False, transform=transform, download=to_download)
 
     train_loader = torch.utils.data.DataLoader(
         dataset=train_dataset,
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     print('Start training:')
     n_epoch = args.epochs
-    for epoch in trange(1, n_epoch + 1, leave=True):
+    for epoch in range(1, n_epoch + 1):
         for batch_idx, (x, _) in enumerate(train_loader):
             x = x.view(-1, mnist_dim).to(device)
             D_train(x, G, D, D_optimizer, criterion, device)
